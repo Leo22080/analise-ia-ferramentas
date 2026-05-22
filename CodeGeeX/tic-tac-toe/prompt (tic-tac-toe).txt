@@ -1,0 +1,37 @@
+Crie um jogo da velha multiplayer usando Python, Tkinter e sockets TCP.
+
+REQUISITOS:
+
+ARQUITETURA:
+- Um jogador atua como servidor
+- Outro jogador atua como cliente
+- Comunicação via sockets TCP
+- O jogo deve poder ser testado localmente na mesma máquina (localhost)
+
+FUNCIONAMENTO:
+- O servidor inicia primeiro e aguarda conexão
+- O cliente conecta ao servidor via IP local (127.0.0.1)
+- Após conexão, o jogo inicia automaticamente
+- Jogadores alternam turnos (X e O)
+- Cada jogada deve ser enviada via socket e refletida no outro lado
+
+INTERFACE:
+- Usar Tkinter
+- Tabuleiro 3x3 com botões clicáveis
+- Exibir jogador atual
+- Exibir mensagem de vitória ou empate
+- Botão de reiniciar jogo
+
+REGRAS:
+- Verificar vitória
+- Verificar empate
+- Bloquear jogadas fora do turno
+
+IMPLEMENTAÇÃO:
+- Código em UM ÚNICO ARQUIVO
+- Usar threads para não travar a interface Tkinter
+- Separar claramente lógica, interface e comunicação
+- Incluir comentários explicativos
+
+IMPORTANTE:
+- O sistema deve funcionar com duas instâncias do programa abertas na mesma máquina

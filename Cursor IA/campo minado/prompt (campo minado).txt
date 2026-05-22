@@ -1,0 +1,18 @@
+Crie em Python um jogo completo de Campo Minado usando Tkinter com as seguintes características:
+
+- Tabuleiro padrão de 8x8 com 10 minas.
+- Cada célula é um botão que pode ser clicado.
+- Clique esquerdo revela a célula:
+  - Se for mina, mostra 💣, exibe um popup de derrota e reinicia o jogo.
+  - Se for número, mostra a quantidade de minas vizinhas.
+  - Se for 0, revela automaticamente os vizinhos.
+- Clique direito coloca ou remove uma bandeira 🚩 na célula, sem permitir revelar enquanto houver bandeira.
+- O jogo deve verificar vitória: se todas as casas seguras forem abertas, mostrar popup de vitória e reiniciar automaticamente.
+- Adicione um contador de bandeiras restantes no topo da janela, que começa com o número total de minas e diminui conforme o jogador coloca bandeiras, aumentando novamente quando remove.
+- Sempre que o jogador perder ou ganhar, todas as minas devem ser reveladas no tabuleiro.
+- Estruture o código em uma classe chamada CampoMinado.
+- Inclua o método iniciar_jogo() para reiniciar o tabuleiro após vitória ou derrota.
+- Use tkinter.messagebox para os popups de vitória e derrota.
+- O programa deve rodar com root = tk.Tk(), título "Campo Minado", e root.mainloop().
+
+Entregue o código Python completo e funcional.

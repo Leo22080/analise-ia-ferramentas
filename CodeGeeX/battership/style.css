@@ -1,0 +1,80 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #0a1f44; /* Azul marinho de fundo */
+    color: #f0f0f0;
+}
+
+h1 {
+    color: #ffcc00; /* Amarelo estilo título naval */
+    text-shadow: 2px 2px 4px black;
+}
+
+#game-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 20px;
+}
+
+/* Tabuleiro como grid */
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 35px);
+    grid-template-rows: repeat(10, 35px);
+    gap: 2px;
+    background-color: #1a3a6e; /* Azul escuro para lembrar oceano */
+    padding: 10px;
+    border: 3px solid #fff;
+    border-radius: 8px;
+}
+
+/* Cada célula */
+.cell {
+    width: 35px;
+    height: 35px;
+    background-color: #4da6ff; /* Azul claro estilo água */
+    border: 1px solid #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+/* Hover para dar sensação de mira */
+.cell:hover {
+    background-color: #66c2ff;
+}
+
+/* Estados visuais */
+.hit {
+    background-color: crimson;
+    cursor: not-allowed;
+    color: white;
+    font-weight: bold;
+}
+
+.miss {
+    background-color: #e0f7fa; /* Azul bem claro para água */
+    cursor: not-allowed;
+}
+
+.ship {
+    background-color: #555; /* Cinza metálico para navio */
+    border: 1px solid #222;
+}
+
+/* Quando o navio do jogador for atingido */
+.ship.hit {
+    background-color: orange;
+}
+
+/* Status */
+#status {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffcc00;
+}

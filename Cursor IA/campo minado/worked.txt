@@ -1,0 +1,17 @@
+worked for 44s
+Lendo o prompt do campo minado para entender o que você precisa.
+
+Jogo de Campo Minado criado em campo minado/campo_minado.py, conforme o prompt.
+
+Funcionalidades
+
+Tabuleiro 8×8 com 10 minas
+Clique esquerdo: revela célula (mina 💣, número colorido ou expansão automática em células 0)
+Clique direito: alterna bandeira 🚩; células com bandeira não revelam
+Contador Bandeiras restantes no topo (inicia em 10)
+Vitória/derrota: popup com messagebox, revela todas as minas e chama iniciar_jogo()
+Classe CampoMinado com iniciar_jogo()
+Como executar
+
+python "c:\Users\leoco\OneDrive\Área de Trabalho\LLMs (CodeGeeX vs Cursor IA)\Cursor IA\campo minado\campo_minado.py"
+A janela abre com o título Campo Minado. Use o botão esquerdo para revelar e o direito para marcar bandeiras.

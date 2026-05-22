@@ -1,0 +1,188 @@
+// ================================
+// CONFIGURAÇÕES DO JOGO
+// ================================
+
+// Tamanho do tabuleiro (ex: 10x10)
+const BOARD_SIZE = 10;
+
+// Lista de tamanhos dos navios
+// Ex: [5, 4, 3, 3, 2]
+const SHIP_SIZES = [5, 4, 3];
+
+
+// ================================
+// CLASSE SHIP (NAVIO)
+// ================================
+
+// Representa um navio no jogo
+// Deve armazenar:
+// - tamanho
+// - posições ocupadas no tabuleiro
+// - número de acertos recebidos
+// - verificar se foi afundado
+
+class Ship {
+    constructor(size) {
+        // tamanho do navio
+        // posições ocupadas (array de coordenadas)
+        // hits recebidos
+    }
+
+    // registrar um acerto no navio
+    hit() {
+        // incrementar contador de acertos
+    }
+
+    // verificar se o navio foi afundado
+    isSunk() {
+        // retornar true se hits == tamanho
+    }
+}
+
+
+// ================================
+// CLASSE BOARD (TABULEIRO)
+// ================================
+
+// Representa o tabuleiro do jogo
+// Deve conter:
+// - matriz 2D
+// - lista de navios
+// - posicionamento de navios
+// - lógica de ataque
+
+class Board {
+    constructor(size) {
+        // criar matriz 2D (array de arrays)
+        // inicializar com valores vazios
+        // armazenar lista de navios
+    }
+
+    // posicionar todos os navios automaticamente
+    placeShips() {
+        // percorrer SHIP_SIZES
+        // posicionar navios aleatoriamente
+        // garantir que não sobreponham
+    }
+
+    // posicionar um único navio
+    placeShip(ship) {
+        // escolher posição aleatória
+        // escolher orientação (horizontal/vertical)
+        // validar posição
+        // adicionar à matriz
+    }
+
+    // verificar se posição é válida
+    isValidPlacement(positions) {
+        // verificar limites do tabuleiro
+        // verificar sobreposição
+    }
+
+    // receber ataque em uma coordenada (x, y)
+    receiveAttack(x, y) {
+        // verificar se tem navio
+        // marcar hit ou miss
+        // retornar resultado ("hit", "miss")
+    }
+
+    // verificar se todos os navios foram destruídos
+    allShipsSunk() {
+        // percorrer navios
+        // verificar se todos estão afundados
+    }
+}
+
+
+// ================================
+// CLASSE GAME (JOGO)
+// ================================
+
+// Controla o fluxo do jogo
+// Deve conter:
+// - tabuleiro do jogador
+// - tabuleiro do inimigo
+// - controle de turno
+// - lógica de vitória
+
+class Game {
+    constructor() {
+        // criar tabuleiro do jogador
+        // criar tabuleiro do inimigo
+        // posicionar navios
+        // definir turno inicial
+    }
+
+    // inicializar o jogo
+    init() {
+        // chamar renderização dos tabuleiros
+        // adicionar eventos de clique
+    }
+
+    // lidar com ataque do jogador
+    playerAttack(x, y) {
+        // atacar tabuleiro inimigo
+        // verificar resultado
+        // atualizar UI
+        // verificar vitória
+        // trocar turno
+    }
+
+    // ataque automático do inimigo (IA simples)
+    enemyAttack() {
+        // escolher posição aleatória
+        // atacar tabuleiro do jogador
+        // atualizar UI
+    }
+
+    // verificar se alguém venceu
+    checkWinner() {
+        // verificar se todos navios de um lado foram destruídos
+        // exibir mensagem de vitória
+    }
+}
+
+
+// ================================
+// FUNÇÕES DE INTERFACE (UI)
+// ================================
+
+// Criar visual do tabuleiro na tela
+function createBoardUI(containerId) {
+    // criar elementos div para cada célula
+    // adicionar classe "cell"
+    // armazenar coordenadas (dataset)
+}
+
+// Atualizar célula visualmente
+function updateCell(cellElement, result) {
+    // adicionar classe "hit" ou "miss"
+}
+
+// Mostrar mensagem de status
+function setStatus(message) {
+    // atualizar texto da div #status
+}
+
+
+// ================================
+// EVENTOS
+// ================================
+
+// Adicionar eventos de clique no tabuleiro inimigo
+function addBoardEvents(game) {
+    // selecionar células do tabuleiro inimigo
+    // adicionar eventListener de clique
+    // chamar game.playerAttack(x, y)
+}
+
+
+// ================================
+// INICIALIZAÇÃO DO JOGO
+// ================================
+
+// Criar instância do jogo
+const game = new Game();
+
+// Inicializar jogo
+game.init();

@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#game-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 20px;
+}
+
+/* Tabuleiro como grid */
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(10, 30px);
+    gap: 2px;
+}
+
+/* Cada célula */
+.cell {
+    width: 30px;
+    height: 30px;
+    background-color: lightblue;
+    border: 1px solid #333;
+    cursor: pointer;
+}
+
+/* Estados visuais */
+.hit {
+    background-color: red;
+}
+
+.miss {
+    background-color: gray;
+}
+
+.ship {
+    background-color: darkblue;
+}
+
+
+/* Quando o navio do jogador for atingido */
+.ship.hit {
+    background-color: orange; /* ou outra cor que você queira */
+}
