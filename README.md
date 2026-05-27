@@ -150,6 +150,77 @@ Implementação realizada pela IA:
 
 ---
 
+## 🧠♟️ 5. Gekitai Multiplayer Modular (Python)
+
+### 🖼️ Resultados
+
+**CodeGeeX**
+![Gekitai CodeGeeX](imagens/gekitai-CodeGeeX.png)
+
+**Cursor AI**
+![Gekitai Cursor](imagens/gekitai-CursorAI.png)
+
+---
+
+### 🔍 Descrição do Experimento
+
+Desenvolvimento de um jogo inspirado em **Gekitai**, com maior complexidade arquitetural:
+
+- Tabuleiro 6x6
+- Mecânica de empurrão em 8 direções
+- Sistema de reservas de peças
+- Condições de vitória (alinhamento ou bloqueio)
+- Interface gráfica com Tkinter
+- Comunicação multiplayer via sockets TCP
+- Uso de threads para sincronização
+
+Estrutura modular obrigatória:
+
+- `game_logic.py`
+- `network.py`
+- `ui.py`
+- `main.py`
+
+---
+
+### ⚖️ Comparação
+
+**CodeGeeX**
+- Interpretou o prompt global e gerou os 4 arquivos diretamente
+- Sistema funcional com poucos ajustes
+- Necessidade de copiar/colar código manualmente
+- Boa qualidade inicial da interface
+
+**Cursor AI**
+- Inicialmente implementou apenas parte do sistema com prompt global
+- Após refinamento com prompts adicionais:
+  - Gerou todos os módulos corretamente
+- Corrigiu erros rapidamente via interação
+- Forte capacidade de ajuste incremental
+
+---
+
+### 🎨 Interface Gráfica
+
+- Ambas as ferramentas produziram interfaces equivalentes
+- Diferenças apenas estéticas (cores)
+
+**Diferencial:**
+
+- Cursor AI facilita refinamento da interface via agente
+- CodeGeeX exige nova interação manual para ajustes
+
+---
+
+### 🧠 Insight Principal
+
+Este experimento evidenciou dois paradigmas distintos:
+
+- **CodeGeeX**: geração completa a partir de instruções explícitas
+- **Cursor AI**: desenvolvimento iterativo com suporte contínuo
+
+---
+
 ## 📊 Resultados Preliminares (LeetCode)
 
 📎 Planilha completa:  
@@ -180,14 +251,14 @@ https://docs.google.com/spreadsheets/d/1SDyIRqPXjtoc-X6BqTGfE461HPlbLjNK3QUm4Lka
 ### 🟢 Cursor AI
 - Mais consistente
 - Melhor integração com fluxo de desenvolvimento
-- Suporte eficiente a agentes
+- Forte em desenvolvimento iterativo
 - Menor necessidade de intervenção manual
 
 ### 🔵 CodeGeeX
-- Resultados variáveis
-- Pode gerar soluções muito boas em alguns casos
+- Excelente geração inicial de código
+- Boa aderência a prompts completos
 - Maior dependência de interação manual
-- Limitações no modo agente (em fase beta)
+- Limitações no modo agente (beta)
 
 ---
 
@@ -195,18 +266,20 @@ https://docs.google.com/spreadsheets/d/1SDyIRqPXjtoc-X6BqTGfE461HPlbLjNK3QUm4Lka
 
 - Necessidade de ajustes manuais em ambas as ferramentas
 - Variação de desempenho dependendo da linguagem
-- Instabilidade em funcionalidades mais avançadas (ex: agente no CodeGeeX)
+- Instabilidade em funcionalidades mais avançadas
 
 ---
 
 ## 🧠 Conclusão
 
-Ambas as ferramentas demonstraram capacidade de resolver problemas corretamente, porém com diferenças claras em termos de usabilidade e consistência.
+Ambas as ferramentas demonstraram alta capacidade técnica, sendo capazes de implementar desde algoritmos até sistemas multiplayer completos.
 
-- **Cursor AI** se destaca pela automação e estabilidade
-- **CodeGeeX** apresenta maior variabilidade, exigindo maior intervenção do usuário
+- **Cursor AI** se destaca pela automação, consistência e suporte ao desenvolvimento iterativo
+- **CodeGeeX** se destaca pela capacidade de gerar soluções completas rapidamente a partir de instruções bem definidas
 
-📌 Ferramentas com suporte a agentes tendem a oferecer maior produtividade em cenários reais de desenvolvimento.
+📌 A escolha da ferramenta ideal depende do fluxo de desenvolvimento:
+- geração inicial → CodeGeeX  
+- evolução e manutenção → Cursor AI  
 
 ---
 
@@ -216,9 +289,3 @@ Ambas as ferramentas demonstraram capacidade de resolver problemas corretamente,
 - (Adicionar demais integrantes)
 
 ---
-
-## 🚀 Como Executar
-
-### Campo Minado
-```bash
-python main.py

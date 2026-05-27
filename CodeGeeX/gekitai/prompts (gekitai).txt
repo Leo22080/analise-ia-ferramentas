@@ -1,0 +1,183 @@
+PROMPT 0 — GLOBAL
+Você vai construir um jogo em Python inspirado em uma variação do Gekitai.
+O projeto deve ter 4 arquivos obrigatórios:
+
+game_logic.py
+
+network.py
+
+ui.py
+
+main.py
+
+Requisitos principais:
+
+Tabuleiro 6x6
+
+Dois jogadores: "player1" e "player2"
+
+Cada jogador começa com 8 peças fora do tabuleiro
+
+Jogada: colocar peça em célula vazia
+
+Empurrar peças nas 8 direções (sem efeito em cadeia, apenas uma peça por direção, peças próprias também podem ser empurradas)
+
+Se uma peça sair do tabuleiro, além de ser removida da matriz, ela deve ser devolvida ao jogador (incrementando o contador de peças restantes), para que apareça novamente na reserva.
+
+Vitória: alinhar 3 peças (horizontal, vertical ou diagonal) OU deixar todas as 8 peças do adversário no tabuleiro
+
+Interface gráfica com Tkinter:
+
+Tabuleiro centralizado
+
+Peças desenhadas como círculos (create_oval) com margem interna (padding)
+
+Três cores distintas: tabuleiro, player1, player2
+
+Reservas laterais: cada jogador deve ter 8 peças visíveis à esquerda/direita.
+
+As peças de reserva devem ter o mesmo tamanho das peças do tabuleiro.
+
+Como são 8 peças e a lateral tem apenas 6 células de altura, as peças devem ser desenhadas sobrepostas e alinhadas verticalmente, ocupando proporcionalmente o espaço disponível.
+
+Nunca desenhar peças menores ou fora da área visível.
+
+Comunicação via sockets TCP com threads para multiplayer
+
+Consistência entre os módulos (nomes de funções e estruturas de dados iguais)
+
+
+1. PROMPT — game_logic.py
+Crie o arquivo game_logic.py.
+
+Requisitos:
+
+Classe GameLogic
+
+Tabuleiro 6x6 (matriz)
+
+Jogadores: "player1" e "player2"
+
+Controle de peças restantes (8 cada)
+
+Funções obrigatórias:
+
+make_move(row, col)
+
+is_valid_move(row, col)
+
+push_neighbors(row, col)
+
+switch_player()
+
+Regras:
+
+Implementar empurrão conforme descrito
+
+make_move deve retornar:
+{
+  "board": estado atualizado,
+  "pushed": [((r1,c1),(r2,c2))],
+  "removed": [(r,c)],
+  "current_player": próximo jogador
+}
+
+
+2. PROMPT — network.py
+Crie o arquivo network.py.
+
+Requisitos:
+
+Comunicação via sockets TCP
+
+Cliente e servidor simples
+
+Funções:
+
+start_server()
+
+connect_to_server()
+
+send_move(data)
+
+receive_move()
+
+Formato da jogada:
+{ "action": "move", "row": int, "col": int }
+
+Regra de vitória:
+
+Alinhar 3 peças (horizontal, vertical ou diagonal)
+
+OU deixar todas as 8 peças do adversário no tabuleiro
+
+
+3. PROMPT — ui.py
+Crie o arquivo ui.py usando Tkinter.
+
+Requisitos:
+
+Canvas com tabuleiro 6x6 centralizado
+
+Reservas: player1 à esquerda, player2 à direita
+
+Detectar clique → converter para (row, col) → chamar on_move(row, col)
+
+Desenho:
+
+Peças como círculos (create_oval) com margem interna (padding)
+
+Três cores distintas: tabuleiro, player1, player2
+
+As peças de reserva devem ter o mesmo tamanho das peças no tabuleiro.
+
+Como são 8 peças e a lateral tem apenas 6 células de altura, as peças de reserva devem ser desenhadas sobrepostas e alinhadas verticalmente na lateral, ocupando proporcionalmente o espaço disponível.
+
+Nunca desenhar peças menores ou fora da área visível.
+
+Funções:
+
+draw_board()
+
+draw_pieces(board)
+
+draw_reserves()
+
+render(board_state)
+
+Regra importante:
+
+A UI não pode conter lógica do jogo.
+
+
+4. PROMPT — main.py
+Crie o arquivo main.py para jogo multiplayer.
+
+Fluxo:
+
+Perguntar modo:
+
+'s' → servidor (player1)
+
+'c' → cliente (player2)
+
+Servidor: iniciar start_server(), esperar cliente conectar, só então iniciar lógica e UI
+
+Cliente: tentar conectar em loop até sucesso, só então iniciar lógica e UI
+
+Regras críticas:
+
+UI (Tkinter) só inicia após conexão estabelecida
+
+Usar threads para escutar mensagens da rede
+
+Atualizar UI com root.after()
+
+Fluxo de jogo:
+
+Clique do jogador → enviar jogada via socket → atualizar localmente
+
+Receber jogada → atualizar estado → atualizar UI
+
+
+
