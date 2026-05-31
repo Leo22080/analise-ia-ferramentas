@@ -1,80 +1,121 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    background-color: #1a1a2e;
+    color: #e9e9eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
     text-align: center;
-    background-color: #0a1f44; /* Azul marinho de fundo */
-    color: #f0f0f0;
 }
 
 h1 {
-    color: #ffcc00; /* Amarelo estilo título naval */
-    text-shadow: 2px 2px 4px black;
+    margin-bottom: 10px;
+    color: #0f3460;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-size: 2.5rem;
 }
 
-#game-container {
+#status {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: #e94560;
+    font-weight: bold;
+    height: 30px;
+}
+
+/* Estilo do Botão de Iniciar */
+#start-btn {
+    padding: 10px 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e94560;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#start-btn:hover {
+    background-color: #d13d56;
+    transform: scale(1.05);
+}
+
+#start-btn:active {
+    transform: scale(0.95);
+}
+
+.boards-container {
     display: flex;
+    gap: 40px;
     justify-content: center;
-    gap: 50px;
-    margin-top: 20px;
+    flex-wrap: wrap;
 }
 
-/* Tabuleiro como grid */
+.board-wrapper h2 {
+    margin-bottom: 10px;
+    color: #16c79a;
+}
+
 .board {
     display: grid;
     grid-template-columns: repeat(10, 35px);
     grid-template-rows: repeat(10, 35px);
     gap: 2px;
-    background-color: #1a3a6e; /* Azul escuro para lembrar oceano */
-    padding: 10px;
-    border: 3px solid #fff;
-    border-radius: 8px;
+    background-color: #0f3460;
+    padding: 2px;
+    border: 3px solid #e94560;
+    border-radius: 4px;
 }
 
-/* Cada célula */
 .cell {
+    background-color: #16213e; /* Água */
     width: 35px;
     height: 35px;
-    background-color: #4da6ff; /* Azul claro estilo água */
-    border: 1px solid #333;
     cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 2px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 18px;
-    transition: background-color 0.3s;
+    align-items: center;
+    font-size: 1.2rem; /* Tamanho dos emojis */
 }
 
-/* Hover para dar sensação de mira */
 .cell:hover {
-    background-color: #66c2ff;
+    background-color: #1a1a4e;
 }
 
-/* Estados visuais */
-.hit {
-    background-color: crimson;
-    cursor: not-allowed;
-    color: white;
-    font-weight: bold;
+/* Cores dos Estados */
+.cell.ship {
+    background-color: #4a6fa5; /* Navio visível apenas no tabuleiro do jogador */
 }
 
-.miss {
-    background-color: #e0f7fa; /* Azul bem claro para água */
+.cell.hit {
+    background-color: #e94560; /* Acertou um navio */
     cursor: not-allowed;
 }
 
-.ship {
-    background-color: #555; /* Cinza metálico para navio */
-    border: 1px solid #222;
+.cell.miss {
+    background-color: #a3d8f4; /* Água atingida (Errou) */
+    cursor: not-allowed;
 }
 
-/* Quando o navio do jogador for atingido */
-.ship.hit {
-    background-color: orange;
+.cell.sunk {
+    background-color: #8b0000; /* Navio totalmente afundado */
+    cursor: not-allowed;
 }
 
-/* Status */
-#status {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #ffcc00;
+.cell.disabled {
+    pointer-events: none; /* Desabilita cliques quando não é a vez do jogador */
 }

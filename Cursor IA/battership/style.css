@@ -1,47 +1,359 @@
+/* ===== Variáveis e reset ===== */
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-light: #334155;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --water: #1e3a5f;
+  --water-hover: #2563eb;
+  --ship: #475569;
+  --ship-preview: #64748b;
+  --miss: #64748b;
+  --hit: #ef4444;
+  --sunk: #991b1b;
+  --success: #22c55e;
+  --radius: 8px;
+  --cell-size: clamp(26px, 3.2vw, 36px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 280px);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "boards sidebar";
+  gap: 1rem;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
-#game-container {
-    display: flex;
-    justify-content: center;
-    gap: 50px;
-    margin-top: 20px;
+.sidebar {
+  grid-area: sidebar;
 }
 
-/* Tabuleiro como grid */
+@media (max-width: 960px) {
+  body {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "boards"
+      "sidebar";
+    max-width: 100%;
+  }
+}
+
+/* ===== Cabeçalho ===== */
+.header {
+  grid-area: header;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ===== Layout principal — tabuleiros lado a lado ===== */
+.game-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  grid-area: boards;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  flex: 0 0 auto;
+}
+
+@media (max-width: 720px) {
+  .game-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow-x: visible;
+  }
+}
+
+.panel h2 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.hint {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ===== Tabuleiro ===== */
 .board {
-    display: grid;
-    grid-template-columns: repeat(10, 30px);
-    grid-template-rows: repeat(10, 30px);
-    gap: 2px;
+  display: grid;
+  grid-template-columns: repeat(10, var(--cell-size));
+  grid-template-rows: repeat(10, var(--cell-size));
+  gap: 2px;
+  background: var(--surface-light);
+  padding: 4px;
+  border-radius: var(--radius);
+  user-select: none;
 }
 
-/* Cada célula */
 .cell {
-    width: 30px;
-    height: 30px;
-    background-color: lightblue;
-    border: 1px solid #333;
-    cursor: pointer;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border-radius: 4px;
+  background: var(--water);
+  cursor: default;
+  transition: background 0.15s, transform 0.1s;
 }
 
-/* Estados visuais */
-.hit {
-    background-color: red;
+/* Água */
+.cell--water {
+  background: var(--water);
 }
 
-.miss {
-    background-color: gray;
+/* Embarcação (visível só no tabuleiro do jogador — só cor, sem ícone) */
+.cell--ship {
+  background: var(--ship);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
-.ship {
-    background-color: darkblue;
+.cell--preview {
+  background: var(--ship-preview);
+  opacity: 0.85;
 }
 
+.cell--preview-invalid {
+  background: #7f1d1d;
+  opacity: 0.7;
+}
 
-/* Quando o navio do jogador for atingido */
-.ship.hit {
-    background-color: orange; /* ou outra cor que você queira */
+/* Errou */
+.cell--miss {
+  background: var(--miss);
+  color: var(--text-muted);
+}
+
+/* Acertou */
+.cell--hit {
+  background: var(--hit);
+  animation: pulse 0.3s ease;
+}
+
+/* Afundou */
+.cell--sunk {
+  background: var(--sunk);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Tabuleiro inimigo — células clicáveis na batalha */
+.panel--enemy .cell--water.cell--attackable {
+  cursor: crosshair;
+}
+
+.panel--enemy .cell--water.cell--attackable:hover {
+  background: var(--water-hover);
+}
+
+.panel--enemy .cell--miss,
+.panel--enemy .cell--hit,
+.panel--enemy .cell--sunk {
+  cursor: not-allowed;
+}
+
+/* Tabuleiro do jogador — sem clique na batalha */
+.panel--player .cell {
+  cursor: default;
+}
+
+/* Fase de posicionamento */
+.placing .panel--player .cell--water {
+  cursor: pointer;
+}
+
+.placing .panel--player .cell--water:hover {
+  background: var(--water-hover);
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.status {
+  background: var(--surface);
+  padding: 1rem;
+  border-radius: var(--radius);
+  border-left: 4px solid var(--accent);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  min-height: 4rem;
+}
+
+.status--win {
+  border-left-color: var(--success);
+}
+
+.status--lose {
+  border-left-color: var(--hit);
+}
+
+.fleet-setup {
+  background: var(--surface);
+  padding: 1rem;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fleet-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.current-ship {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.orientation {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #475569;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--small {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  flex: 1;
+}
+
+.btn--small.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btn--secondary {
+  background: transparent;
+  border: 1px solid var(--text-muted);
+}
+
+.legend {
+  background: var(--surface);
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+}
+
+.legend h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.legend ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.swatch--water { background: var(--water); }
+.swatch--ship { background: var(--ship); }
+.swatch--miss { background: var(--miss); }
+.swatch--hit { background: var(--hit); }
+.swatch--sunk { background: var(--sunk); }
+
+.hidden {
+  display: none !important;
+}
+
+/* Bloqueio durante turno da IA */
+.board--locked {
+  pointer-events: none;
+  opacity: 0.85;
 }

@@ -1,0 +1,27 @@
+Crie um projeto front-end completo para um jogo de Batalha Naval (homem vs máquina). 
+O projeto deve conter três arquivos: index.html, style.css e script.js.
+
+Requisitos:
+1. O index.html deve estruturar o tabuleiro e interface do jogo, com áreas separadas para jogador e inimigo.
+2. O style.css deve aplicar um design simples e claro, destacando células atingidas, embarcações e água.
+3. O script.js deve implementar toda a lógica do jogo, incluindo:
+   - Jogador humano contra inimigo controlado por IA.
+   - A IA deve escolher alvos aleatórios até atingir uma embarcação.
+   - Quando atingir uma embarcação, deve procurar os próximos alvos ao redor da célula atingida.
+   - Ao atingir um segundo alvo, deve identificar a direção da embarcação e continuar atacando nos dois sentidos até encontrar água em ambos os lados.
+   - Considerar que a IA pode atingir o meio da embarcação, então deve explorar para frente e para trás.
+   - Sempre que um jogador ou a IA acertar um alvo, ganha uma jogada extra.
+4. O código deve estar bem organizado, modularizado e comentado para facilitar entendimento.
+5. Inclua funções separadas para:
+   - Inicialização do tabuleiro
+   - Jogadas do jogador
+   - Jogadas da IA
+   - Verificação de vitória
+6. A interface pode conter elementos gráficos simples (como emojis ou ícones) para representar água e acertos.
+
+
+***Ajustes Necessários***
+O CodeGeeX entregou o jogo funcionando, mas foi feito dois ajustes:
+
+1º: Desenhar navios tanto na horizontal como na vertical.
+2º: Desenhar embarcações sempre com pelo menos uma célula de separação, para assim impedir que navios fiquem encostados.

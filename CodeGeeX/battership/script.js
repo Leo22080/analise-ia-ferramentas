@@ -1,322 +1,419 @@
-// ================================
-// CONFIGURAÇÕES DO JOGO
-// ================================
-
+// ==========================================
+// CONFIGURAÇÕES E CONSTANTES
+// ==========================================
 const BOARD_SIZE = 10;
-const SHIP_SIZES = [5, 4, 3];
+const SHIPS = [
+    { name: 'Porta-Aviões', size: 5 },
+    { name: 'Encouraçado', size: 4 },
+    { name: 'Cruzador', size: 3 },
+    { name: 'Submarino', size: 3 },
+    { name: 'Destroyer', size: 2 }
+];
 
-// ================================
-// CLASSE SHIP (NAVIO)
-// ================================
+// Direções: [linha, coluna]
+const DIRECTIONS = [
+    [-1, 0], // Cima
+    [1, 0],  // Baixo
+    [0, -1], // Esquerda
+    [0, 1]   // Direita
+];
 
-class Ship {
-    constructor(size) {
-        this.size = size;
-        this.positions = [];
-        this.hits = 0;
-    }
+let playerBoard, enemyBoard;
+let isPlayerTurn = true;
+let gameOver = false;
 
-    hit() {
-        this.hits++;
-    }
+// Estado da IA
+let aiState = {
+    mode: 'hunt', // 'hunt' (procurando) ou 'target' (caçando)
+    hits: [],     // Acertos no navio atual
+    direction: null, // Direção confirmada do navio
+    triedDirections: [] // Direções já testadas a partir do primeiro acerto
+};
 
-    isSunk() {
-        return this.hits === this.size;
+// ==========================================
+// INICIALIZAÇÃO DO TABULEIRO
+// ==========================================
+function startGame() {
+    gameOver = false;
+    isPlayerTurn = true;
+    aiState = {
+        mode: 'hunt',
+        hits: [],
+        direction: null,
+        triedDirections: []
+    };
+
+    playerBoard = createEmptyGrid();
+    enemyBoard = createEmptyGrid();
+    
+    SHIPS.forEach(ship => {
+        placeShipRandomly(playerBoard, ship);
+        placeShipRandomly(enemyBoard, ship);
+    });
+
+    renderBoard('player-board', playerBoard, true);
+    renderBoard('enemy-board', enemyBoard, false);
+    
+    document.getElementById('status').innerText = "Sua vez! Clique no tabuleiro inimigo.";
+    document.getElementById('start-btn').innerText = "Reiniciar Jogo";
+}
+
+// Cria uma grade 10x10 vazia
+function createEmptyGrid() {
+    return Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
+}
+
+// Posiciona navios aleatoriamente sem sobreposição
+// Posiciona navios aleatoriamente sem sobreposição
+function placeShipRandomly(board, ship) {
+    let placed = false;
+    while (!placed) {
+        // Escolhe aleatoriamente entre as 4 direções (Vertical e Horizontal)
+        const dir = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+        const row = Math.floor(Math.random() * BOARD_SIZE);
+        const col = Math.floor(Math.random() * BOARD_SIZE);
+        
+        if (canPlaceShip(board, row, col, dir, ship.size)) {
+            for (let i = 0; i < ship.size; i++) {
+                board[row + dir[0] * i][col + dir[1] * i] = ship.size;
+            }
+            placed = true;
+        }
     }
 }
 
-// ================================
-// CLASSE BOARD (TABULEIRO)
-// ================================
 
-class Board {
-    constructor(size) {
-        this.size = size;
-        this.grid = Array.from({ length: size }, () => Array(size).fill(null));
-        this.ships = [];
-        this.attackedPositions = new Set();
-    }
+// Verifica se é possível colocar o navio na posição dada
+// Verifica se é possível colocar o navio na posição dada, garantindo 1 célula de distância de outros navios
+function canPlaceShip(board, row, col, dir, size) {
+    for (let i = 0; i < size; i++) {
+        const r = row + dir[0] * i;
+        const c = col + dir[1] * i;
+        
+        // 1. Verifica se está dentro do tabuleiro
+        if (r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE) return false;
+        
+        // 2. Verifica se a própria célula já está ocupada
+        if (board[r][c] !== 0) return false;
 
-    placeShips() {
-        SHIP_SIZES.forEach(size => {
-            let placed = false;
-            while (!placed) {
-                const ship = new Ship(size);
-                placed = this.placeShip(ship);
+        // 3. Verifica as 8 células ao redor (incluindo diagonais) para garantir o espaçamento
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                if (dr === 0 && dc === 0) continue; // Ignora a própria célula (já verificada acima)
+                
+                const nr = r + dr;
+                const nc = c + dc;
+                
+                // Verifica se o vizinho está dentro do tabuleiro
+                if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                    // Se houver qualquer navio nas redondezas, o posicionamento é inválido
+                    if (board[nr][nc] !== 0) return false;
+                }
             }
-        });
-    }
-
-    placeShip(ship) {
-        const isHorizontal = Math.random() > 0.5;
-        let x = Math.floor(Math.random() * this.size);
-        let y = Math.floor(Math.random() * this.size);
-
-        const positions = [];
-        for (let i = 0; i < ship.size; i++) {
-            const currX = isHorizontal ? x : x + i;
-            const currY = isHorizontal ? y + i : y;
-            positions.push({ x: currX, y: currY });
         }
-
-        if (!this.isValidPlacement(positions)) return false;
-
-        positions.forEach(pos => {
-            this.grid[pos.x][pos.y] = ship;
-            ship.positions.push(pos);
-        });
-        this.ships.push(ship);
-        return true;
     }
+    return true;
+}
 
-    isValidPlacement(positions) {
-        for (const pos of positions) {
-            if (pos.x >= this.size || pos.y >= this.size || pos.x < 0 || pos.y < 0) return false;
-            if (this.grid[pos.x][pos.y] !== null) return false;
+
+// Renderiza a grade no DOM
+function renderBoard(boardId, board, showShips) {
+    const boardEl = document.getElementById(boardId);
+    boardEl.innerHTML = '';
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+
+            if (board[r][c] === 'X') {
+                cell.classList.add('hit');
+                cell.innerHTML = '💥'; // Emoji de explosão (acerto)
+            }
+            else if (board[r][c] === 'O') {
+                cell.classList.add('miss');
+                cell.innerHTML = '💧'; // Emoji de gota (erro)
+            }
+            else if (board[r][c] === 'S') {
+                cell.classList.add('sunk');
+                cell.innerHTML = '💥'; // Emoji de explosão (afundado)
+            }
+            else if (showShips && board[r][c] > 0) {
+                cell.classList.add('ship');
+            }
+
+            // Apenas o tabuleiro inimigo é clicável
+            if (boardId === 'enemy-board') {
+                cell.addEventListener('click', handlePlayerMove);
+            }
+            boardEl.appendChild(cell);
         }
-        return true;
-    }
-
-    receiveAttack(x, y) {
-        const key = `${x},${y}`;
-        if (this.attackedPositions.has(key)) return "already_attacked";
-        
-        this.attackedPositions.add(key);
-        const target = this.grid[x][y];
-        
-        if (target) {
-            target.hit();
-            return target.isSunk() ? "sunk" : "hit"; // Retorna "sunk" se afundou
-        }
-        return "miss";
-    }
-
-    allShipsSunk() {
-        return this.ships.every(ship => ship.isSunk());
     }
 }
 
-// ================================
-// CLASSE GAME (JOGO)
-// ================================
+// ==========================================
+// LÓGICA DO JOGADOR
+// ==========================================
+function handlePlayerMove(event) {
+    if (!isPlayerTurn || gameOver) return;
 
-class Game {
-    constructor() {
-        this.playerBoard = new Board(BOARD_SIZE);
-        this.enemyBoard = new Board(BOARD_SIZE);
-        this.playerBoard.placeShips();
-        this.enemyBoard.placeShips();
-        this.isPlayerTurn = true;
-        this.gameOver = false;
+    const row = parseInt(event.target.dataset.row);
+    const col = parseInt(event.target.dataset.col);
+    
+    // Ignora cliques em células já atacadas
+    if (enemyBoard[row][col] === 'X' || enemyBoard[row][col] === 'O' || enemyBoard[row][col] === 'S') return;
 
-        // REFATORAÇÃO: Estado da IA Inimiga
-        this.enemyMode = 'hunt'; // 'hunt' (aleatório) ou 'target' (caçando)
-        this.enemyTargetQueue = []; // Fila de coordenadas a atirar
-        this.enemyHitStack = []; // Histórico de acertos no navio atual
-    }
+    const hit = processAttack(enemyBoard, row, col);
+    renderBoard('enemy-board', enemyBoard, false);
 
-    init() {
-        // Como o HTML já está no arquivo index.html, apenas criamos o UI do tabuleiro
-        createBoardUI("player-board", this.playerBoard, true);
-        createBoardUI("enemy-board", this.enemyBoard, false);
-        addBoardEvents(this);
-        setStatus("Sua vez! Clique no tabuleiro inimigo para atacar.");
-    }
-
-    // REFATORAÇÃO: Tiros extras para o jogador
-    playerAttack(x, y) {
-        if (!this.isPlayerTurn || this.gameOver) return;
-
-        const result = this.enemyBoard.receiveAttack(x, y);
-        if (result === "already_attacked") return;
-
-        const cell = document.querySelector(`#enemy-board [data-x="${x}"][data-y="${y}"]`);
-        updateCell(cell, result === "sunk" ? "hit" : result);
-
-        if (this.checkWinner()) return;
-
-        // LÓGICA DE TURNO EXTRA: Se acertou, mantém o turno. Se errou, passa.
-        if (result === "hit" || result === "sunk") {
-            setStatus("💥 Acertou! Jogue novamente.");
-        } else {
-            this.isPlayerTurn = false;
-            setStatus("Turno do inimigo...");
-            setTimeout(() => this.enemyAttack(), 1000);
+    if (hit) {
+        document.getElementById('status').innerText = "Você acertou! Jogue novamente.";
+        if (checkVictory(enemyBoard)) {
+            endGame("Você venceu!");
         }
+    } else {
+        document.getElementById('status').innerText = "Você errou. Vez da IA.";
+        isPlayerTurn = false;
+        disableEnemyBoard(true);
+        setTimeout(handleAIMove, 1000); // Dá um tempo para a IA "pensar"
+    }
+}
+
+// ==========================================
+// LÓGICA DA IA
+// ==========================================
+function handleAIMove() {
+    if (gameOver) return;
+
+    let target;
+    if (aiState.mode === 'hunt') {
+        target = getHuntTarget();
+    } else {
+        target = getTargetModeTarget();
     }
 
-    // REFATORAÇÃO: IA Inteligente + Tiros extras para o inimigo
-    enemyAttack() {
-        if (this.gameOver) return;
-        let x, y, result;
+    const hit = processAttack(playerBoard, target.row, target.col);
+    renderBoard('player-board', playerBoard, true);
+
+    if (hit) {
+        document.getElementById('status').innerText = "A IA acertou! Ela joga novamente.";
+        updateAIStateOnHit(target.row, target.col);
         
-        // --- LÓGICA DA IA ---
-        if (this.enemyMode === 'target' && this.enemyTargetQueue.length > 0) {
-            // Modo Caça: Puxa a próxima coordenada da fila
-            const target = this.enemyTargetQueue.shift();
-            x = target.x;
-            y = target.y;
-            result = this.playerBoard.receiveAttack(x, y);
-            
-            if (result === "already_attacked") {
-                if (this.enemyTargetQueue.length === 0) this.resetEnemyHunt();
-                setTimeout(() => this.enemyAttack(), 0); 
-                return;
-            }
+        if (checkVictory(playerBoard)) {
+            endGame("A IA venceu!");
+            return;
+        }
+        setTimeout(handleAIMove, 1000); // IA joga novamente por ter acertado
+    } else {
+        document.getElementById('status').innerText = "A IA errou. Sua vez!";
+        updateAIStateOnMiss();
+        isPlayerTurn = true;
+        disableEnemyBoard(false);
+    }
+}
+
+// Modo Caça: Atira aleatoriamente
+function getHuntTarget() {
+    let row, col;
+    do {
+        row = Math.floor(Math.random() * BOARD_SIZE);
+        col = Math.floor(Math.random() * BOARD_SIZE);
+    } while (playerBoard[row][col] === 'X' || playerBoard[row][col] === 'O' || playerBoard[row][col] === 'S');
+    return { row, col };
+}
+
+// Modo Alvo: Segue a lógica inteligente de caça ao redor e na direção
+function getTargetModeTarget() {
+    if (aiState.direction) {
+        return getNextTargetInDirection();
+    } else {
+        return getAdjacentTarget();
+    }
+}
+
+// Tenta encontrar alvos adjacentes ao primeiro acerto
+function getAdjacentTarget() {
+    const origin = aiState.hits[0];
+    const shuffledDirs = [...DIRECTIONS].sort(() => Math.random() - 0.5);
+
+    for (let dir of shuffledDirs) {
+        if (aiState.triedDirections.includes(dir.toString())) continue;
+
+        const newRow = origin.row + dir[0];
+        const newCol = origin.col + dir[1];
+
+        if (isValidTarget(newRow, newCol)) {
+            return { row: newRow, col: newCol, dir: dir };
         } else {
-            // Modo Aleatório: Escolher posição que ainda não foi atacada
-            this.resetEnemyHunt();
-            do {
-                x = Math.floor(Math.random() * BOARD_SIZE);
-                y = Math.floor(Math.random() * BOARD_SIZE);
-                result = this.playerBoard.receiveAttack(x, y);
-            } while (result === "already_attacked");
+            aiState.triedDirections.push(dir.toString());
         }
+    }
+    return getHuntTarget();
+}
 
-        const cell = document.querySelector(`#player-board [data-x="${x}"][data-y="${y}"]`);
-        updateCell(cell, result === "sunk" ? "hit" : result);
+// Continua atirando na direção confirmada, para frente e para trás
+function getNextTargetInDirection() {
+    const dir = aiState.direction;
+    const maxHit = aiState.hits.reduce((max, h) => (h.row * dir[0] + h.col * dir[1]) > (max.row * dir[0] + max.col * dir[1]) ? h : max);
+    const posTarget = { row: maxHit.row + dir[0], col: maxHit.col + dir[1] };
 
-        if (this.checkWinner()) return;
+    if (isValidTarget(posTarget.row, posTarget.col)) {
+        return posTarget;
+    }
 
-        // --- PROCESSAMENTO DA IA E TURNO EXTRA ---
-        if (result === "hit") {
-            this.enemyMode = 'target';
-            this.enemyHitStack.push({ x, y });
-            this.processEnemyHit(x, y);
-            setStatus("💥 Inimigo acertou! Ele joga novamente...");
-            setTimeout(() => this.enemyAttack(), 1000);
-            
-        } else if (result === "sunk") {
-            this.resetEnemyHunt();
-            setStatus("💥 Inimigo afundou um navio! Ele joga novamente...");
-            setTimeout(() => this.enemyAttack(), 1000);
-            
-        } else {
-            this.isPlayerTurn = true;
-            setStatus("Sua vez! Clique no tabuleiro inimigo para atacar.");
+    const minHit = aiState.hits.reduce((min, h) => (h.row * dir[0] + h.col * dir[1]) < (min.row * dir[0] + min.col * dir[1]) ? h : min);
+    const negTarget = { row: minHit.row - dir[0], col: minHit.col - dir[1] };
+
+    if (isValidTarget(negTarget.row, negTarget.col)) {
+        return negTarget;
+    }
+
+    aiState.mode = 'hunt';
+    return getHuntTarget();
+}
+
+// Atualiza o estado da IA quando acerta um navio
+function updateAIStateOnHit(row, col) {
+    if (aiState.mode === 'hunt') {
+        aiState.mode = 'target';
+        aiState.hits = [{ row, col }];
+        aiState.direction = null;
+        aiState.triedDirections = [];
+    } else {
+        aiState.hits.push({ row, col });
+        
+        if (aiState.hits.length >= 2 && !aiState.direction) {
+            const first = aiState.hits[0];
+            const second = aiState.hits[1];
+            aiState.direction = [Math.sign(second.row - first.row), Math.sign(second.col - first.col)];
+            aiState.triedDirections = [];
         }
     }
 
-    // REFATORAÇÃO: Processa o acerto da IA para encontrar a direção do navio
-    processEnemyHit(x, y) {
-        const directions = [
-            { dx: -1, dy: 0 }, // Cima
-            { dx: 1, dy: 0 },  // Baixo
-            { dx: 0, dy: -1 }, // Esquerda
-            { dx: 0, dy: 1 }   // Direita
-        ];
-
-        if (this.enemyHitStack.length === 1) {
-            // Primeiro acerto: adiciona as 4 posições adjacentes
-            for (let d of directions) {
-                this.enqueueTarget(x + d.dx, y + d.dy);
-            }
-        } else {
-            // Acertos subsequentes: descobre a direção e continua nela
-            const prevHit = this.enemyHitStack[this.enemyHitStack.length - 2];
-            const dx = x - prevHit.x;
-            const dy = y - prevHit.y;
-
-            this.enqueueTarget(x + dx, y + dy); // Continua na mesma direção
-
-            // Se for o 2º acerto, testa o sentido oposto a partir do primeiro acerto
-            if (this.enemyHitStack.length === 2) {
-                this.enqueueTarget(prevHit.x - dx, prevHit.y - dy);
-            }
-        }
+    if (playerBoard[row][col] === 'S') {
+        resetAIState();
     }
+}
 
-    // REFATORAÇÃO: Adiciona alvos válidos à fila da IA
-    enqueueTarget(x, y) {
-        const key = `${x},${y}`;
-        if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE && !this.playerBoard.attackedPositions.has(key)) {
-            if (!this.enemyTargetQueue.some(t => t.x === x && t.y === y)) {
-                this.enemyTargetQueue.push({ x, y });
-            }
-        }
-    }
+// Atualiza o estado da IA quando erra
+function updateAIStateOnMiss() {
+    // A lógica de inversão de direção já é tratada em getNextTargetInDirection
+}
 
-    // REFATORAÇÃO: Reseta a IA para o modo aleatório
-    resetEnemyHunt() {
-        this.enemyMode = 'hunt';
-        this.enemyTargetQueue = [];
-        this.enemyHitStack = [];
-    }
+// Reseta o estado da IA quando um navio é afundado
+function resetAIState() {
+    aiState = {
+        mode: 'hunt',
+        hits: [],
+        direction: null,
+        triedDirections: []
+    };
+}
 
-    checkWinner() {
-        if (this.enemyBoard.allShipsSunk()) {
-            setStatus("🎉 Você venceu! Todos os navios inimigos foram afundados!");
-            this.gameOver = true;
-            return true;
-        }
-        if (this.playerBoard.allShipsSunk()) {
-            setStatus("💀 Você perdeu! Todos os seus navios foram afundados!");
-            this.gameOver = true;
-            return true;
-        }
+// ==========================================
+// FUNÇÕES AUXILIARES
+// ==========================================
+
+// Processa um ataque em um tabuleiro e retorna true se acertou
+function processAttack(board, row, col) {
+    if (board[row][col] > 0) { // Acertou um navio
+        board[row][col] = 'X'; // Marca como acerto
+        checkAndMarkSunkShips(board);
+        return true;
+    } else if (board[row][col] === 0) { // Água
+        board[row][col] = 'O';
         return false;
     }
+    return false;
 }
 
-// ================================
-// FUNÇÕES DE INTERFACE (UI)
-// ================================
+// Verifica e marca navios totalmente afundados com 'S'
+function checkAndMarkSunkShips(board) {
+    markSunkShipHelper(board);
+}
 
-function createBoardUI(containerId, board, showShips) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
+function markSunkShipHelper(board) {
+    const visited = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
     
-    for (let x = 0; x < BOARD_SIZE; x++) {
-        for (let y = 0; y < BOARD_SIZE; y++) {
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
-            cell.dataset.x = x;
-            cell.dataset.y = y;
-            
-            if (showShips && board.grid[x][y] !== null) {
-                cell.classList.add("ship");
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            if (board[r][c] === 'X' && !visited[r][c]) {
+                const shipCells = [];
+                const queue = [{r, c}];
+                visited[r][c] = true;
+                let isSunk = true;
+
+                while (queue.length > 0) {
+                    const curr = queue.shift();
+                    shipCells.push(curr);
+
+                    for (let dir of DIRECTIONS) {
+                        const nr = curr.r + dir[0];
+                        const nc = curr.c + dir[1];
+
+                        if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && !visited[nr][nc]) {
+                            if (board[nr][nc] === 'X') {
+                                visited[nr][nc] = true;
+                                queue.push({r: nr, c: nc});
+                            } else if (board[nr][nc] > 0) {
+                                isSunk = false;
+                                visited[nr][nc] = true; 
+                                queue.push({r: nr, c: nc});
+                            }
+                        }
+                    }
+                }
+
+                if (isSunk) {
+                    shipCells.forEach(cell => {
+                        board[cell.r][cell.c] = 'S';
+                    });
+                }
             }
-            
-            container.appendChild(cell);
         }
     }
 }
 
-function updateCell(cellElement, result) {
-    if (!cellElement) return;
-    if (result === "hit") {
-        cellElement.classList.add("hit");
-        cellElement.textContent = "💥";
-    } else if (result === "miss") {
-        cellElement.classList.add("miss");
-        cellElement.textContent = "💧";
+// Verifica se o alvo é válido (dentro do tabuleiro e não atacado)
+function isValidTarget(row, col) {
+    return row >= 0 && row < BOARD_SIZE && 
+           col >= 0 && col < BOARD_SIZE && 
+           playerBoard[row][col] !== 'X' && 
+           playerBoard[row][col] !== 'O' && 
+           playerBoard[row][col] !== 'S';
+}
+
+// Verifica a condição de vitória (se não há mais navios intactos)
+function checkVictory(board) {
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            if (board[r][c] > 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Finaliza o jogo
+function endGame(message) {
+    gameOver = true;
+    document.getElementById('status').innerText = message;
+    document.getElementById('start-btn').innerText = "Jogar Novamente";
+    disableEnemyBoard(true);
+    
+    // Se a IA venceu, revela as embarcações inimigas não atingidas
+    if (message === "A IA venceu!") {
+        renderBoard('enemy-board', enemyBoard, true);
     }
 }
 
-function setStatus(message) {
-    const statusDiv = document.getElementById("status");
-    if (statusDiv) statusDiv.innerText = message;
-}
-
-// ================================
-// EVENTOS
-// ================================
-
-function addBoardEvents(game) {
-    const enemyBoard = document.getElementById("enemy-board");
-    enemyBoard.addEventListener("click", (e) => {
-        const cell = e.target;
-        if (!cell.classList.contains("cell")) return;
-        
-        const x = parseInt(cell.dataset.x);
-        const y = parseInt(cell.dataset.y);
-        game.playerAttack(x, y);
+// Desabilita o tabuleiro inimigo durante o turno da IA
+function disableEnemyBoard(disable) {
+    const cells = document.querySelectorAll('#enemy-board .cell');
+    cells.forEach(cell => {
+        if (disable) cell.classList.add('disabled');
+        else cell.classList.remove('disabled');
     });
 }
-
-// ================================
-// INICIALIZAÇÃO DO JOGO
-// ================================
-
-const game = new Game();
-game.init();

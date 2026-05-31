@@ -98,35 +98,36 @@ Cada ferramenta foi utilizada conforme suas capacidades disponíveis.
 
 ![Batalha Naval](imagens/batalha-naval.png)
 
-### 🔍 Estrutura Inicial
+## 🔍 Descrição do Experimento
 
-Arquivos já existentes:
-- `index.html`
-- `style.css`
+Desenvolvimento de um jogo completo de Batalha Naval (Humano vs Máquina) a partir de um único prompt, exigindo:
 
-Implementação realizada pela IA:
-- `script.js`
+Estrutura completa de front-end:
+index.html
+style.css
+script.js
+Implementação da lógica do jogo em JavaScript
+Criação de uma IA com comportamento estratégico progressivo
 
-### ⚖️ Comparação
-
-**Cursor AI**
-- Utilizou modo agente
-- Implementação mais direta
+## ⚖️ Comparação
 
 **CodeGeeX**
-- Utilizou chat
-- Necessário fornecer todo o contexto:
-  - HTML
-  - CSS
-  - Estrutura geral
 
-### 🎨 Diferencial
+Entregou o projeto funcional com boa aderência ao prompt
+Implementação inicial da lógica consistente
+Necessitou ajustes pontuais:
+Suporte a navios horizontais e verticais
+Regra de espaçamento entre embarcações
 
-- CodeGeeX adicionou:
-  - Estilização adicional via JavaScript
-  - Elementos visuais:
-    - 💧 Gota (erro)
-    - 💥 Explosão (acerto)
+**Cursor AI**
+
+Estrutura e interface corretamente geradas
+IA inicialmente incompleta:
+Não afundava completamente os navios
+Limitava-se a atacar ao redor do primeiro acerto
+Após refinamento:
+Passou a identificar direção corretamente
+Implementou exploração completa da embarcação
 
 ---
 

@@ -1,34 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Battleship</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batalha Naval — Homem vs Máquina</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header class="header">
+    <h1>⚓ Batalha Naval</h1>
+    <p class="subtitle">Homem vs Máquina</p>
+  </header>
 
-    <h1>Battleship</h1>
+  <main class="game-container">
+    <section class="panel panel--enemy" aria-label="Tabuleiro inimigo">
+      <h2>🎯 Tabuleiro inimigo <span class="hint">(clique para atacar)</span></h2>
+      <div id="enemy-board" class="board" role="grid" aria-label="Ataque ao inimigo"></div>
+    </section>
 
-    <!-- Container principal -->
-    <div id="game-container">
+    <section class="panel panel--player" aria-label="Tabuleiro do jogador">
+      <h2>🛡️ Seu tabuleiro</h2>
+      <div id="player-board" class="board" role="grid" aria-label="Suas embarcações"></div>
+    </section>
+  </main>
 
-        <!-- Tabuleiro do jogador -->
-        <div>
-            <h2>Seu Tabuleiro</h2>
-            <div id="player-board" class="board"></div>
-        </div>
-
-        <!-- Tabuleiro do inimigo -->
-        <div>
-            <h2>Inimigo</h2>
-            <div id="enemy-board" class="board"></div>
-        </div>
-
+  <aside class="sidebar">
+    <div id="status" class="status" role="status" aria-live="polite">
+      Posicione suas embarcações e clique em <strong>Iniciar</strong>.
     </div>
 
-    <!-- Mensagens do jogo -->
-    <div id="status"></div>
+    <div class="fleet-setup" id="fleet-setup">
+      <p class="fleet-label">Embarcação a posicionar:</p>
+      <p id="current-ship" class="current-ship">Porta-aviões (5)</p>
+      <div class="orientation">
+        <button type="button" id="btn-horizontal" class="btn btn--small active">Horizontal</button>
+        <button type="button" id="btn-vertical" class="btn btn--small">Vertical</button>
+      </div>
+      <button type="button" id="btn-random" class="btn">🎲 Posicionar aleatório</button>
+      <button type="button" id="btn-start" class="btn btn--primary" disabled>Iniciar batalha</button>
+    </div>
 
-    <script src="script.js"></script>
+    <div class="legend">
+      <h3>Legenda</h3>
+      <ul>
+        <li><span class="swatch swatch--water"></span> 🌊 Água</li>
+        <li><span class="swatch swatch--ship"></span> Embarcação (só você vê)</li>
+        <li><span class="swatch swatch--miss"></span> 💨 Errou</li>
+        <li><span class="swatch swatch--hit"></span> 💥 Acertou</li>
+        <li><span class="swatch swatch--sunk"></span> 🔥 Afundou</li>
+      </ul>
+    </div>
+
+    <button type="button" id="btn-restart" class="btn btn--secondary hidden">↺ Nova partida</button>
+  </aside>
+
+  <script src="script.js"></script>
 </body>
 </html>
